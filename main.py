@@ -109,7 +109,7 @@ if __name__ == '__main__':
     print(project_path)
     get_dataframe()
     setup_frame()
-    print(call_data)
-    print(analysis())
+    # print(call_data)
+    # print(analysis())
     analysis().to_csv('output.csv', sep='\t')
 
