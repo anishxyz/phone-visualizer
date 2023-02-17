@@ -15,6 +15,7 @@ folder_path = os.path.join(project_path, 'data')
 # dataframe with all call logs
 call_data = []
 
+
 # print data of all .csv logs
 def print_files():
     for filename in os.listdir(folder_path):
@@ -81,8 +82,24 @@ def analysis(mom_number=None):
     # Rename columns
     result.columns = ['total_duration', 'incoming_count', 'outgoing_count']
 
+    result['outgoing_to_incoming_ratio'] = result['outgoing_count'] / result['incoming_count']
+    result['distinct_days'] = grouped.apply(
+        lambda x: x[x['minutes'] > 1]['date'].dt.date.nunique()
+    )
+
     # Calculate ratio of outgoing to incoming calls
     # result['outgoing_to_incoming_ratio'] = result['outgoing_count'] / result['incoming_count']
+
+    if mom_number is not None:
+        ignore_months = [5, 6, 7, 8, 12]
+        mom_calls = result[result.index.get_level_values('number') == mom_number]
+        mom_calls = mom_calls[~mom_calls.index.get_level_values('date').month.isin(ignore_months)]
+        mom_calls = mom_calls.groupby(level='date').sum()  # group by date
+        incoming_greater = len(mom_calls[mom_calls['incoming_count'] > mom_calls['outgoing_count']])
+        outgoing_greater = len(mom_calls[mom_calls['incoming_count'] < mom_calls['outgoing_count']])
+        print(f"{mom_number} called more than you in {incoming_greater} weeks.")
+        print(f"You called {mom_number} more than they called you in {outgoing_greater} weeks.")
+        print(f"Average distinct days with calls longer than 1 minute per week: {result['distinct_days'].mean()}")
 
     return result
 
@@ -90,7 +107,6 @@ def analysis(mom_number=None):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     print(project_path)
-    print(folder_path)
     get_dataframe()
     setup_frame()
     print(call_data)
