@@ -28,6 +28,7 @@ def print_files():
                         print(row)
 
 
+# builds dataframe from csv files stored in data
 def get_dataframe():
     global call_data
     temp = []
@@ -52,6 +53,8 @@ def get_dataframe():
     call_data.columns = ["date", "number", "destination", "minutes", "type"]
 
 
+# sets up data frame for further analysis
+# cleans data
 def setup_frame():
     call_data['date'] = pd.to_datetime(call_data['date'], format='%m/%d/%Y %I:%M %p')
     call_data['minutes'] = call_data['minutes'].str.extract(r'(\d+)').astype(int)
@@ -59,6 +62,11 @@ def setup_frame():
         .str.replace('-', '').str.replace(' ', '').replace('', np.nan).astype(float).astype(pd.Int64Dtype())
 
 
+# analyze all the data!
+# get incoming and outgoing counts
+# get total time per week chatted
+# get ratio on who is calling more?
+# average distinct days talked per week
 def analysis(mom_number=None):
     global call_data
 
@@ -104,7 +112,7 @@ def analysis(mom_number=None):
     return result
 
 
-# Press the green button in the gutter to run the script.
+# run it all here
 if __name__ == '__main__':
     print(project_path)
     get_dataframe()
